@@ -1,6 +1,6 @@
 {
   "name": "quaternionjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple API for working with quaternions. useful for 3d rotations",
   "main": "index.js",
   "scripts": {
