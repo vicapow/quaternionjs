@@ -1,0 +1,12 @@
+{
+  "name": "quaternionjs",
+  "version": "0.0.1",
+  "description": "A simple class for working with quaternions. useful for 3d rotations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Victor Powell <vicapw@gmail.com>",
+  "license": "BSD"
+}

@@ -1,0 +1,83 @@
+<!doctype HTML>
+<html>
+  <head>
+    <script src="d3.js"></script>
+    <script src="../quaternion.js"></script>
+  </head>
+  <body>
+    <script>
+var svg = d3.select('body').append('svg')
+var d = -4 // how far the box is from the camera
+
+box = translate(generateBox(5, 2), [0, 0, d])
+
+function generateBox(n, width){
+  var s = width / (n - 1), t = width / 2
+  var points = []
+  for(var x = 0; x < n; x++){
+    for(var y = 0; y < n; y++){
+      for(var z = 0; z < n; z++){
+        points.push([x * s - t, y * s - t, z * s - t])
+      }
+    }
+  }
+  return points
+}
+function rotate(points, theta){
+  var q = quaternion()
+    .fromAxis({x: 1, y: 0, z: 0}, theta)
+    .multi(quaternion().fromAxis({x: 0, y: 1, z: 0}, theta))
+    .multi(quaternion().fromAxis({x: 0, y: 0, z: 1}, theta))
+  return points.slice(0).map(q.multiVec)
+}
+
+/*
+return [ 
+  p[0] * Math.cos(theta) - p[2] * Math.sin(theta) 
+  , p[1]
+  , p[0] * Math.sin(theta) + p[2] * Math.cos(theta) 
+]
+*/
+
+function translate(points, delta){
+  return points.slice(0).map(function(p){
+    return [p[0] + delta[0], p[1] + delta[1], p[2] + delta[2]]
+  })
+}
+
+// eye is located at [0, 0, 0]
+// eye is pointing at [0,0,-1]
+
+// image plane is at [0, 0, -1]
+imagePlane = [0, 0, -1]
+
+function vec_scale3d(vec, scale){
+  return [vec[0] * scale, vec[1] * scale, vec[2] * scale]
+}
+
+var scale = d3.scale.linear().domain([0, 1]).range([300, 600])
+
+// orthographic project. (just drop the z axis)
+var circles = svg.selectAll('circle').data(box)
+circles.enter().append('circle')
+
+var theta = 0
+setInterval(function(){
+  var t = translate(box, [0, 0, -d])
+  t = rotate(t, theta += 0.005)
+  t = translate(t, [0, 0, d])
+  t = t.map(function(p){
+    var Ax = p[0], Ay = p[1], Az = p[2]
+    var Bz = imagePlane[2]
+    return vec_scale3d(p, Bz / Az)
+  })
+  circles.data(t).attr({
+    r: 5
+    , cx: function(d){ return scale(d[0]) }
+    , cy: function(d){ return scale(d[1]) } 
+  })
+}, 10)
+
+    </script>
+  </body>
+</html>
